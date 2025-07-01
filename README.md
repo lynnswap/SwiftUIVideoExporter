@@ -5,7 +5,7 @@ SwiftUIVideoExporter is a Swift package that captures frames from a SwiftUI view
 ## Features
 - Render SwiftUI views at custom sizes and frame rates
 - Encode videos as `.mp4`, `.mov`, or `.m4v`
-- Track progress of the export process
+- Track progress of the export process in ~10% increments
 
 ## Usage
 ```swift
@@ -16,6 +16,7 @@ let url = try await SwiftUIVideoExporter.export(
     fps: 30,
     renderSize: CGSize(width: 1920, height: 1080),
     displayScale: UIScreen.main.scale,
+    // called about every 10% of the export
     progress: { value in
         print("progress", value)
     }
