@@ -4,7 +4,7 @@ import SwiftUI
 
 @Test func progressCallback() async throws {
     var values: [Double] = []
-    _ = try await SwiftUIVideoExporter.export(
+    let url = try await SwiftUIVideoExporter.export(
         duration: 2,
         fps: 10,
         renderSize: .init(width: 16, height: 16),
@@ -16,6 +16,7 @@ import SwiftUI
     ) { _ in
         Color.red
     }
+    try? FileManager.default.removeItem(at: url)
     #expect(values.count == 10)
     #expect(values.first == 0)
     #expect(values.last == 1)
