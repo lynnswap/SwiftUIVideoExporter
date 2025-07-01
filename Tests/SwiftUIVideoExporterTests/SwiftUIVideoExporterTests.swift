@@ -13,7 +13,9 @@ import SwiftUI
     ) { _ in
         Color.red
     }
-    #expect(values.count == 12)
+    // progress should be reported at start, roughly every 10%, and at the end
+    // for a total of eleven callbacks
+    #expect(values.count == 11)
     #expect(values.first == 0)
     #expect(values.last == 1)
 }
