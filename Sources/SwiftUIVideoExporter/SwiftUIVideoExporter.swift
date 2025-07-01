@@ -11,6 +11,7 @@ public enum SwiftUIVideoExporter {
         renderSize: CGSize,
         fileType: AVFileType = .mp4,
         displayScale: CGFloat,
+        progress: @escaping @MainActor (Double) -> Void = { _ in },
         buildFrame: @escaping @MainActor (Double) -> V
     ) async throws -> URL {
         
@@ -32,6 +33,8 @@ public enum SwiftUIVideoExporter {
         guard writer.startWriting() else { throw writer.error! }
         writer.startSession(atSourceTime: .zero)
         let scale = displayScale
+        await MainActor.run { progress(0) }
+        var lastProgressReport = 0.0
         for frame in 0..<totalFrames {
             let t = Double(frame) / Double(fps)
             let cgImage:CGImage? = await MainActor.run{
@@ -50,9 +53,17 @@ public enum SwiftUIVideoExporter {
             let presentationTime = CMTime(value: CMTimeValue(frame), timescale: CMTimeScale(fps))
             while !input.isReadyForMoreMediaData { await Task.yield() }
             adaptor.append(pixelBuffer, withPresentationTime: presentationTime)
+            let pct = Double(frame + 1) / Double(totalFrames)
+            if pct - lastProgressReport >= 0.1 || pct == 1 {
+                lastProgressReport = pct
+                await MainActor.run { progress(pct) }
+            }
         }
         input.markAsFinished()
         await writer.finishWriting()
+        if lastProgressReport < 1 {
+            await MainActor.run { progress(1) }
+        }
         return tempURL
     }
 }
