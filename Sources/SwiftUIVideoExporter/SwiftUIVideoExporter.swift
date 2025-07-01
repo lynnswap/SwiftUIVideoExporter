@@ -5,7 +5,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 public enum SwiftUIVideoExporter {
-    static func export<V: View>(
+    public static func export<V: View>(
         duration: Double = 10,
         fps: Int = 30,
         renderSize: CGSize,
